@@ -32,6 +32,16 @@ const val REMAINING = "remaining"
 const val TAKE = "take"
 const val MONEY_GIVEN = "I gave you $##"
 
+/**
+ * This coffee machine class simulates a coffee machine with
+ * a certain amount of resources. The goal is to allow the user
+ * a couple of differant ways to interact with the machine.
+ * The user can buy a coffee, refill the machines resources,
+ * print the state of the machine, withdraw the money from the
+ * machine, and exit the machine. The machine starts already
+ * having a default number of water, milk, coffee beans,
+ * disposable cups, and money.
+ */
 class CoffeeMachine(
     private var water: Int = DEFAULT_WATER,
     private var milk: Int = DEFAULT_MILK,
@@ -45,6 +55,14 @@ class CoffeeMachine(
         println(ACTION_QUESTION)
     }
 
+    /**
+     * Controls the entire flow of interacting with the coffee machine.
+     * The entire machine is controlled through just one function.
+     * First the user is asked what they would like to do either,
+     * buy, refill machine, print state of machine, withdraw money, or exit
+     * program. after that they are instructed to do it again, or do the next
+     * step of the action they decided to go with.
+     */
     fun console(input: String): Boolean {
         when (action) {
             0 -> {
@@ -118,6 +136,11 @@ class CoffeeMachine(
         return false
     }
 
+    /**
+     * This function prints out the state of the coffee
+     * machine including the amount of resources as well
+     * as the amount of money available to withdraw.
+     */
     private fun printCoffeeMachineSummary() {
         println(COFFEE_MACHINE_HAS)
         println(water.toString() + ML_OF_WATER)
@@ -128,53 +151,54 @@ class CoffeeMachine(
         println()
     }
 
+    /**
+     * This function is used to determine which drink the user
+     * would like to buy. It also allows the user to go back to
+     * main menu if so desired.
+     */
     private fun buy(input: String) {
         if (input == BACK) {
             return
         }
         when (input.toInt()) {
-            1 -> buyEspresso()
-            2 -> buyLatte()
-            3 -> buyCappuccino()
+            1 -> buyDrink(CoffeeDrink.ESPRESSO)
+            2 -> buyDrink(CoffeeDrink.LATTE)
+            3 -> buyDrink(CoffeeDrink.CAPPUCCINO)
         }
         println()
     }
 
+    /**
+     * This function prints the amount of money given to the
+     * user for withdraw.
+     */
     private fun take() {
         println(MONEY_GIVEN.replace(TEMP_STRING, money.toString()))
         takeMoney()
         println()
     }
 
-    private fun buyEspresso() {
-        if (enoughResources(CoffeeDrink.ESPRESSO)) {
-            water -= CoffeeDrink.ESPRESSO.water
-            coffeeBeans -= CoffeeDrink.ESPRESSO.coffeeBeans
+    /**
+     * Checks to see whether there is enough resources to make a drink
+     * if so the drink gets made and the resources used to make the
+     * drink get subtracted from the amount available.
+     */
+    private fun buyDrink(coffeeDrink: CoffeeDrink) {
+        if (enoughResources(coffeeDrink)) {
+            water -= coffeeDrink.water
+            milk -= coffeeDrink.milk
+            coffeeBeans -= coffeeDrink.coffeeBeans
             disposableCups--
-            money += CoffeeDrink.ESPRESSO.cost
+            money += coffeeDrink.cost
         }
     }
 
-    private fun buyLatte() {
-        if (enoughResources(CoffeeDrink.LATTE)) {
-            water -= CoffeeDrink.LATTE.water
-            milk -= CoffeeDrink.LATTE.milk
-            coffeeBeans -= CoffeeDrink.LATTE.coffeeBeans
-            disposableCups--
-            money += CoffeeDrink.LATTE.cost
-        }
-    }
-
-    private fun buyCappuccino() {
-        if (enoughResources(CoffeeDrink.CAPPUCCINO)) {
-            water -= CoffeeDrink.CAPPUCCINO.water
-            milk -= CoffeeDrink.CAPPUCCINO.milk
-            coffeeBeans -= CoffeeDrink.CAPPUCCINO.coffeeBeans
-            disposableCups--
-            money += CoffeeDrink.CAPPUCCINO.cost
-        }
-    }
-
+    /**
+     * The purpose of this function is tp check whether there is
+     * enough of a resource to make a certain drink. If the
+     * amount required is more than the machine has it prints
+     * out a statement saying what it needs.
+     */
     private fun enoughResources(coffeeDrink: CoffeeDrink): Boolean {
         when {
             water - coffeeDrink.water < 0 -> {
@@ -204,22 +228,42 @@ class CoffeeMachine(
         }
     }
 
+    /**
+     * The amount of water the user added gets passed to
+     * the amount of water in the machine.
+     */
     private fun addWater(addWater: Int) {
         water += addWater
     }
 
+    /**
+     * The amount of milk the user added gets passed to
+     * the amount of milk in the machine.
+     */
     private fun addMilk(addMilk: Int) {
         milk += addMilk
     }
 
+    /**
+     * The amount of coffee beans the user added gets passed to
+     * the amount of coffee beans in the machine.
+     */
     private fun addCoffeeBeans(addCoffeeBeans: Int) {
         coffeeBeans += addCoffeeBeans
     }
 
+    /**
+     * The amount of cups the user added gets passed the amount of
+     * cups in the machine.
+     */
     private fun addDisposableCups(addCups: Int) {
         disposableCups += addCups
     }
 
+    /**
+     * Takes the money from the coffee machine and sets the variable
+     * money to 0
+     */
     private fun takeMoney() {
         money -= this.money
     }
