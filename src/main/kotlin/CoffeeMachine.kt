@@ -1,18 +1,36 @@
-
-
-const val DEFAULT_WATER: Int = 400
-const val DEFAULT_MILK: Int = 540
-const val DEFAULT_COFFEE_BEANS: Int = 120
-const val DEFAULT_DISPOSABLE_CUPS: Int = 9
-const val DEFAULT_MONEY: Int = 550
-const val COFFEE_MACHINE_HAS: String = "The coffee machine has:"
-const val ML_OF_WATER: String = " ml of water"
-const val ML_OF_MILK: String = " ml of milk"
-const val G_OF_COFFEE_BEANS: String = " g of coffee beans"
-const val AMOUNT_OF_DISPOSABLE_CUPS: String = " disposable cups"
-const val OF_MONEY: String = "$## of money"
+const val DEFAULT_WATER = 400
+const val DEFAULT_MILK = 540
+const val DEFAULT_COFFEE_BEANS = 120
+const val DEFAULT_DISPOSABLE_CUPS = 9
+const val DEFAULT_MONEY = 550
+const val GOOD_BYE = "Good-Bye!"
+const val COFFEE_MACHINE_HAS = "The coffee machine has:"
+const val ML_OF_WATER = " ml of water"
+const val ML_OF_MILK = " ml of milk"
+const val G_OF_COFFEE_BEANS = " g of coffee beans"
+const val AMOUNT_OF_DISPOSABLE_CUPS = " disposable cups"
+const val OF_MONEY = "$## of money"
 const val ACTION_START = 0
 const val STEP_START = 0
+const val ACTION_QUESTION = "Write action (buy, fill, take, remaining, exit):"
+const val DRINK_QUESTION = "What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:"
+const val ADD_WATER_QUESTION = "Write how many ml of water you want to add:"
+const val ADD_MILK_QUESTION = "Write how many ml of milk you want to add:"
+const val ADD_COFFEE_BEANS_QUESTION = "Write how many grams of coffee beans you want to add:"
+const val ADD_DISPOSABLE_CUPS_QUESTION = "Write how many disposable cups you want to add:"
+const val ENOUGH_RESOURCES = "I have enough resources, making you a coffee!"
+const val NOT_ENOUGH_WATER = "Sorry, not enough water!"
+const val NOT_ENOUGH_MILK = "Sorry, not enough milk!"
+const val NOT_ENOUGH_COFFEE_BEANS = "Sorry, not enough coffee beans!"
+const val NOT_ENOUGH_DISPOSABLE_CUPS = "Sorry, not enough disposable cups!"
+const val TEMP_STRING: String = "##"
+const val BACK = "back"
+const val EXIT = "exit"
+const val FILL = "fill"
+const val BUY = "buy"
+const val REMAINING = "remaining"
+const val TAKE = "take"
+const val MONEY_GIVEN = "I gave you $##"
 
 class CoffeeMachine(
     private var water: Int = DEFAULT_WATER,
@@ -24,35 +42,38 @@ class CoffeeMachine(
     private var step: Int = STEP_START
 ) {
     init {
-        println("Write action (buy, fill, take, remaining, exit):")
+        println(ACTION_QUESTION)
     }
 
     fun console(input: String): Boolean {
         when (action) {
             0 -> {
                 when (input) {
-                    "exit" -> return true
-                    "remaining" -> {
+                    EXIT -> {
+                        println(GOOD_BYE)
+                        return true
+                    }
+                    REMAINING -> {
                         println()
                         printCoffeeMachineSummary()
-                        println("Write action (buy, fill, take, remaining, exit):")
+                        println(ACTION_QUESTION)
                     }
 
-                    "take" -> {
+                    TAKE -> {
                         println()
                         take()
-                        println("Write action (buy, fill, take, remaining, exit):")
+                        println(ACTION_QUESTION)
                     }
 
-                    "buy" -> {
+                    BUY -> {
                         println()
-                        println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
+                        println(DRINK_QUESTION)
                         action++
                     }
 
-                    "fill" -> {
+                    FILL -> {
                         println()
-                        println("Write how many ml of water you want to add:")
+                        println(ADD_WATER_QUESTION)
                         action = 2
                     }
                 }
@@ -60,7 +81,7 @@ class CoffeeMachine(
 
             1 -> {
                 buy(input)
-                println("Write action (buy, fill, take, remaining, exit):")
+                println(ACTION_QUESTION)
                 action--
             }
 
@@ -68,26 +89,26 @@ class CoffeeMachine(
                 when (step) {
                     0 -> {
                         addWater(input.toInt())
-                        println("Write how many ml of milk you want to add:")
+                        println(ADD_MILK_QUESTION)
                         step++
                     }
 
                     1 -> {
                         addMilk(input.toInt())
-                        println("Write how many grams of coffee beans you want to add:")
+                        println(ADD_COFFEE_BEANS_QUESTION)
                         step++
                     }
 
                     2 -> {
                         addCoffeeBeans(input.toInt())
-                        println("Write how many disposable cups you want to add:")
+                        println(ADD_DISPOSABLE_CUPS_QUESTION)
                         step++
                     }
 
                     3 -> {
                         addDisposableCups(input.toInt())
                         println()
-                        println("Write action (buy, fill, take, remaining, exit):")
+                        println(ACTION_QUESTION)
                         action = 0
                         step = 0
                     }
@@ -103,12 +124,12 @@ class CoffeeMachine(
         println(milk.toString() + ML_OF_MILK)
         println(coffeeBeans.toString() + G_OF_COFFEE_BEANS)
         println(disposableCups.toString() + AMOUNT_OF_DISPOSABLE_CUPS)
-        println(OF_MONEY.replace("##", money.toString()))
+        println(OF_MONEY.replace(TEMP_STRING, money.toString()))
         println()
     }
 
     private fun buy(input: String) {
-        if (input == "back") {
+        if (input == BACK) {
             return
         }
         when (input.toInt()) {
@@ -120,7 +141,7 @@ class CoffeeMachine(
     }
 
     private fun take() {
-        println("I gave you $$money")
+        println(MONEY_GIVEN.replace(TEMP_STRING, money.toString()))
         takeMoney()
         println()
     }
@@ -157,27 +178,27 @@ class CoffeeMachine(
     private fun enoughResources(coffeeDrink: CoffeeDrink): Boolean {
         when {
             water - coffeeDrink.water < 0 -> {
-                println("Sorry, not enough water!")
+                println(NOT_ENOUGH_WATER)
                 return false
             }
 
             milk - coffeeDrink.milk < 0 -> {
-                println("Sorry, not enough milk!")
+                println(NOT_ENOUGH_MILK)
                 return false
             }
 
             coffeeBeans - coffeeDrink.coffeeBeans < 0 -> {
-                println("Sorry, not enough coffee beans!")
+                println(NOT_ENOUGH_COFFEE_BEANS)
                 return false
             }
 
             disposableCups - 1 < 0 -> {
-                println("Sorry, not enough disposable cups!")
+                println(NOT_ENOUGH_DISPOSABLE_CUPS)
                 return false
             }
 
             else -> {
-                println("I have enough resources, making you a coffee!")
+                println(ENOUGH_RESOURCES)
                 return true
             }
         }
